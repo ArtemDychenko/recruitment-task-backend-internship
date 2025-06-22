@@ -1,14 +1,15 @@
 import datetime
+
 from profil_logger.logger import LogEntry
 
 
 def test_logentry_to_dict_and_from_dict():
     now = datetime.datetime.now()
-    entry = LogEntry(date=now, level="INFO", msg="Test")
+    entry = LogEntry(date=now, level="INFO", message="Test")
     data = entry.to_dict()
     assert data["date"] == now.isoformat()
     assert data["level"] == "INFO"
-    assert data["msg"] == "Test"
+    assert data["message"] == "Test"
 
     recreated = LogEntry.from_dict(data)
     assert recreated.date == now

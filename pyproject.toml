@@ -18,7 +18,7 @@ readme = "README.md"
 dev = ["pytest", "ruff"]
 
 [project.urls]
-Repository = "https://github.com/ArtemDychenko/profil_logger"
+Repository = "https://github.com/ArtemDychenko/recruitment-task-backend-internship.git"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

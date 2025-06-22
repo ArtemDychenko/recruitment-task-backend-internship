@@ -1,6 +1,6 @@
 import datetime
-from profil_logger.logger import LogEntry
-from profil_logger.logger import ProfilLoggerReader
+
+from profil_logger.logger import LogEntry, ProfilLoggerReader
 
 
 class DummyHandler:

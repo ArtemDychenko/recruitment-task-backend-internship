@@ -1,6 +1,7 @@
-from profil_logger import CSVHandler, JsonHandler, FileHandler, SQLLiteHandler
-from profil_logger.logger import LogEntry
 import datetime
+
+from profil_logger import CSVHandler, FileHandler, JsonHandler, SQLLiteHandler
+from profil_logger.logger import LogEntry
 
 
 def test_json_handler_can_persist_and_retrieve_log(tmp_path):
@@ -85,7 +86,7 @@ def test_sqlite_handler_missing_table(tmp_path):
     db_path = tmp_path / "logs.sqlite"
     handler = SQLLiteHandler(str(db_path))
 
-    with handler._get_conn() as conn:
+    with handler._get_connection() as conn:
         conn.execute("DROP TABLE logs")
 
     logs = handler.retrieve_all_logs_sql()
@@ -107,4 +108,42 @@ def test_csv_handler_empty_file(tmp_path):
 
     handler = CSVHandler(path)
     logs = handler.retrieve_all_logs_csv()
+    assert logs == []
+
+
+def test_json_handler_overwrites_correctly(tmp_path):
+    path = tmp_path / "log.json"
+    handler = JsonHandler(path)
+
+    first = LogEntry(datetime.datetime.now(), "DEBUG", "First")
+    second = LogEntry(datetime.datetime.now(), "ERROR", "Second")
+
+    handler.persist_log_json(first)
+    handler.persist_log_json(second)
+
+    logs = handler.retrieve_all_logs_json()
+    assert len(logs) == 2
+
+
+def test_csv_handler_ignores_invalid_rows(tmp_path):
+    path = tmp_path / "log.csv"
+    path.write_text("a,b,c,d,e\n")
+
+    handler = CSVHandler(path)
+    logs = handler.retrieve_all_logs_csv()
+
+    assert logs == []
+
+
+def test_sqlite_handler_invalid_data(tmp_path):
+    db_path = tmp_path / "logs.sqlite"
+    handler = SQLLiteHandler(str(db_path))
+
+    with handler._get_connection() as conn:
+        conn.execute(
+            "INSERT INTO logs (timestamp, level, message) VALUES (?, ?, ?)",
+            ("not-a-date", "INFO", "Bad entry"),
+        )
+
+    logs = handler.retrieve_all_logs_sql()
     assert logs == []

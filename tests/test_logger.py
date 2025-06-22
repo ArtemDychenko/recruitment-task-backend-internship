@@ -1,5 +1,7 @@
-from profil_logger.logger import ProfilLogger
+import datetime
+
 from profil_logger.handlers import FileHandler
+from profil_logger.logger import LogEntry, ProfilLogger
 
 
 def test_logger_info_level_logged(tmp_path):
@@ -101,3 +103,46 @@ def test_set_invalid_log_level(tmp_path):
     logs = handler.retrieve_all_logs_file()
     assert len(logs) == 1
     assert logs[0].message == "This should be logged"
+
+
+def test_from_dict_missing_keys():
+    bad_data = {"date": "2024-06-22T12:00:00", "message": "Hello"}
+    result = LogEntry.from_dict(bad_data)
+    assert result is None
+
+
+def test_from_dict_invalid_date_format():
+    bad_data = {"date": "22-06-2024", "level": "INFO", "message": "Bad date"}
+    result = LogEntry.from_dict(bad_data)
+    assert result is None
+
+
+def test_from_dict_invalid_log_level():
+    bad_data = {
+        "date": "2024-06-22T12:00:00",
+        "level": "TREX",
+        "message": "Bad level",
+    }
+    result = LogEntry.from_dict(bad_data)
+    assert result is None
+
+
+def test_from_dict_invalid_types():
+    bad_data = {"date": 12345, "level": "INFO", "message": "Wrong type"}
+    result = LogEntry.from_dict(bad_data)
+    assert result is None
+
+
+def test_from_dict_valid_input():
+    valid_data = {
+        "date": "2024-06-22T12:00:00",
+        "level": "INFO",
+        "message": "All good",
+    }
+    result = LogEntry.from_dict(valid_data)
+    assert isinstance(result, LogEntry)
+    assert result.date == datetime.datetime.fromisoformat(
+        "2024-06-22T12:00:00"
+    )
+    assert result.level == "INFO"
+    assert result.message == "All good"
