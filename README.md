@@ -81,4 +81,6 @@ for entry in matches:
     tests/
     ├── test_handlers.py       # Unit tests for all handlers
     ├── test_logger.py         # Tests for ProfilLogger and reader
+    ├── test_reader.py         # Tests for ProfilLoggerReader (search, grouping, etc.)
+    ├── test_log_entry.py      # Tests for LogEntry class (conversion, parsing)
     pyproject.toml             # Ruff configuration
